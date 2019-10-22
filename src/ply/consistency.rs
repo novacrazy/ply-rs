@@ -1,10 +1,10 @@
 //! Allows a `Ply` object to be checked for consistency.
 
-use std::fmt::{ Display, Formatter };
-use std::fmt;
-use std::error;
 use super::Ply;
 use super::PropertyAccess;
+use std::error;
+use std::fmt;
+use std::fmt::{Display, Formatter};
 
 /// Contains a description, why a given `Ply` object isn't consistent and could not be made consistent.
 #[derive(Debug)]
@@ -31,20 +31,20 @@ impl error::Error for ConsistencyError {
     fn description(&self) -> &str {
         &self.description
     }
-    fn cause(&self) -> Option<&error::Error> {
+    fn cause(&self) -> Option<&dyn error::Error> {
         None
     }
 }
 
 fn has_white_space(s: &str) -> bool {
-    return s.contains(" ") || s.contains("\t");
+    s.contains(' ') || s.contains('\t')
 }
 
 fn has_line_break(s: &str) -> bool {
-    return s.contains("\n") || s.contains("\r");
+    s.contains('\n') || s.contains('\r')
 }
 
-impl<E: PropertyAccess> Ply<E>{
+impl<E: PropertyAccess> Ply<E> {
     /// Takes a mutable `Ply` object, performs common operations to make it consistent,
     ///
     /// When written, a consistent `Ply` object generates a valid PLY file.
@@ -61,7 +61,7 @@ impl<E: PropertyAccess> Ply<E>{
     /// For maximal compatability, only ascii characters should be used but this is not checked.
     /// Every relevant string is checked to not contain line breaks.
     /// Identifiers are also checked to not contain white spaces.
-    pub fn make_consistent(&mut self) -> Result<(), ConsistencyError>{
+    pub fn make_consistent(&mut self) -> Result<(), ConsistencyError> {
         for (ek, _) in &self.header.elements {
             if !self.payload.contains_key(ek) {
                 self.payload.insert(ek.clone(), Vec::new());
@@ -77,29 +77,44 @@ impl<E: PropertyAccess> Ply<E>{
             }
             ed.unwrap().count = pe.len();
         }
-        for ref oi in &self.header.obj_infos {
-            if has_line_break(oi) {
-                return Err(ConsistencyError::new(&format!("Objection information `{}` should not contain any line breaks.", oi)));
+        for oi in &self.header.obj_infos {
+            if has_line_break(&oi) {
+                return Err(ConsistencyError::new(&format!(
+                    "Objection information `{}` should not contain any line breaks.",
+                    oi
+                )));
             }
         }
-        for ref c in &self.header.comments {
+        for c in &self.header.comments {
             if has_line_break(&c) {
-               return Err(ConsistencyError::new(&format!("Comment `{}` should not contain any line breaks.", c)));
+                return Err(ConsistencyError::new(&format!("Comment `{}` should not contain any line breaks.", c)));
             }
         }
         for (_, ref e) in &self.header.elements {
             if has_line_break(&e.name) {
-                return Err(ConsistencyError::new(&format!("Name of element `{}` should not contain any line breaks.", e.name)));
+                return Err(ConsistencyError::new(&format!(
+                    "Name of element `{}` should not contain any line breaks.",
+                    e.name
+                )));
             }
             if has_white_space(&e.name) {
-                return Err(ConsistencyError::new(&format!("Name of element `{}` should not contain any white spaces.", e.name)));
+                return Err(ConsistencyError::new(&format!(
+                    "Name of element `{}` should not contain any white spaces.",
+                    e.name
+                )));
             }
             for (_, ref p) in &e.properties {
                 if has_line_break(&p.name) {
-                    return Err(ConsistencyError::new(&format!("Name of property `{}` of element `{}` should not contain any line breaks.", p.name, e.name)));
+                    return Err(ConsistencyError::new(&format!(
+                        "Name of property `{}` of element `{}` should not contain any line breaks.",
+                        p.name, e.name
+                    )));
                 }
                 if has_white_space(&p.name) {
-                    return Err(ConsistencyError::new(&format!("Name of property `{}` of element `{}` should not contain any spaces.", p.name, e.name)));
+                    return Err(ConsistencyError::new(&format!(
+                        "Name of property `{}` of element `{}` should not contain any spaces.",
+                        p.name, e.name
+                    )));
                 }
             }
         }
@@ -133,10 +148,13 @@ mod tests {
         assert!(r.is_err());
     }
     #[test]
-    fn consistent_new_line_fail_property () {
+    fn consistent_new_line_fail_property() {
         let mut p = P::new();
         let mut e = ElementDef::new("ok".to_string());
-        e.properties.add(PropertyDef::new("prop\nwith new line".to_string(), PropertyType::Scalar(ScalarType::Char)));
+        e.properties.add(PropertyDef::new(
+            "prop\nwith new line".to_string(),
+            PropertyType::Scalar(ScalarType::Char),
+        ));
         p.header.elements.add(e);
         let r = p.make_consistent();
         assert!(r.is_err());
@@ -149,10 +167,11 @@ mod tests {
         assert!(r.is_err());
     }
     #[test]
-    fn consistent_white_space_fail_property(){
+    fn consistent_white_space_fail_property() {
         let mut p = P::new();
         let mut e = ElementDef::new("ok".to_string());
-        e.properties.add(PropertyDef::new("prop\twhite space".to_string(), PropertyType::Scalar(ScalarType::Char)));
+        e.properties
+            .add(PropertyDef::new("prop\twhite space".to_string(), PropertyType::Scalar(ScalarType::Char)));
         p.header.elements.add(e);
         let r = p.make_consistent();
         assert!(r.is_err());

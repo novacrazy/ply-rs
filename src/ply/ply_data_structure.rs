@@ -1,8 +1,8 @@
-use std::fmt::{ Display, Formatter };
-use std::fmt;
-use super::PropertyType;
 use super::KeyMap;
 use super::PropertyAccess;
+use super::PropertyType;
+use std::fmt;
+use std::fmt::{Display, Formatter};
 
 /// Models all necessary information to interact with a PLY file.
 ///
@@ -66,7 +66,7 @@ impl Header {
     pub fn new() -> Self {
         Header {
             encoding: Encoding::Ascii,
-            version: Version{major: 1, minor: 0},
+            version: Version { major: 1, minor: 0 },
             obj_infos: Vec::new(),
             elements: KeyMap::new(),
             comments: Vec::new(),
@@ -109,13 +109,11 @@ pub enum Encoding {
 
 impl Display for Encoding {
     fn fmt(&self, f: &mut Formatter) -> Result<(), fmt::Error> {
-        f.write_str(
-            match *self {
-                Encoding::Ascii => "ascii",
-                Encoding::BinaryBigEndian => "binary_big_endian",
-                Encoding::BinaryLittleEndian => "binary_little_endian",
-            }
-        )
+        f.write_str(match *self {
+            Encoding::Ascii => "ascii",
+            Encoding::BinaryBigEndian => "binary_big_endian",
+            Encoding::BinaryLittleEndian => "binary_little_endian",
+        })
     }
 }
 
@@ -156,7 +154,7 @@ impl ElementDef {
     /// No properties are set.
     pub fn new(name: String) -> Self {
         ElementDef {
-            name: name,
+            name,
             count: 0,
             properties: KeyMap::new(),
         }
@@ -179,10 +177,7 @@ pub struct PropertyDef {
 impl PropertyDef {
     /// Creates a new property definition.
     pub fn new(name: String, data_type: PropertyType) -> Self {
-        PropertyDef {
-            name: name,
-            data_type: data_type,
-        }
+        PropertyDef { name, data_type }
     }
 }
 

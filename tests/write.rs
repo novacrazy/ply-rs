@@ -1,7 +1,7 @@
 extern crate ply_rs;
-use ply_rs::*;
 use ply_rs::ply::*;
-use std::io::{ Read, BufReader };
+use ply_rs::*;
+use std::io::{BufReader, Read};
 
 type Ply = ply::Ply<ply::DefaultElement>;
 
@@ -21,7 +21,7 @@ fn write_buff(ply: &Ply) -> Vec<u8> {
 
 fn read_write_ply(ply: &Ply) -> Ply {
     println!("writing ply:\n{:?}", ply);
-    let ve : Vec<u8> = write_buff(&ply);
+    let ve: Vec<u8> = write_buff(&ply);
     let txt = String::from_utf8(ve.clone()).unwrap();
     println!("written ply:\n{}", txt);
     let mut buff = BufReader::new(&(*ve));

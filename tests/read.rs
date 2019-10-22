@@ -67,10 +67,10 @@ fn read_all_atomic_types_ok() {
 }
 
 mod struct_test_1 {
-    use super::ply;
     use super::parser::Parser;
-    use std;
+    use super::ply;
     use super::read_file;
+    use std;
     #[derive(Debug)]
     struct Vertex {
         x: f32,
@@ -83,14 +83,9 @@ mod struct_test_1 {
         vertex_index: Vec<i32>,
     }
 
-
     impl ply::PropertyAccess for Vertex {
         fn new() -> Self {
-            Vertex {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
-            }
+            Vertex { x: 0.0, y: 0.0, z: 0.0 }
         }
         fn set_property(&mut self, key: String, property: ply::Property) {
             match (key.as_ref(), property) {
@@ -105,9 +100,7 @@ mod struct_test_1 {
     // same thing for Face
     impl ply::PropertyAccess for Face {
         fn new() -> Self {
-            Face {
-                vertex_index: Vec::new(),
-            }
+            Face { vertex_index: Vec::new() }
         }
         fn set_property(&mut self, key: String, property: ply::Property) {
             match (key.as_ref(), property) {
@@ -142,8 +135,12 @@ mod struct_test_1 {
         for (_ignore_key, element) in &header.elements {
             // we could also just parse them in sequence, but the file format might change
             match element.name.as_ref() {
-                "vertex" => {vertex_list = vertex_parser.read_payload_for_element(&mut f, &element, &header).unwrap();},
-                "face" => {face_list = face_parser.read_payload_for_element(&mut f, &element, &header).unwrap();},
+                "vertex" => {
+                    vertex_list = vertex_parser.read_payload_for_element(&mut f, &element, &header).unwrap();
+                }
+                "face" => {
+                    face_list = face_parser.read_payload_for_element(&mut f, &element, &header).unwrap();
+                }
                 _ => panic!("Enexpeced element!"),
             }
         }
