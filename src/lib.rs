@@ -8,6 +8,7 @@
         unused_import_braces,
         unused_qualifications)]
 */
+#![allow(ellipsis_inclusive_range_patterns)]
 //! Library for reading/writing ascii and binary PLY files.
 //!
 //! This library has two goals:
