@@ -231,13 +231,13 @@ impl<E: PropertyAccess> Parser<E> {
                 Ok(Line::Comment(ref c)) => (header_comments.push(c.clone())),
                 Ok(Line::Element(ref e)) => header_elements.add(e.clone()),
                 Ok(Line::Property(p)) => {
-                    (if header_elements.is_empty() {
+                    if header_elements.is_empty() {
                         return parse_ascii_error(*location, &line_str, &format!("Property '{:?}' found without preceding element.", p));
                     } else {
                         let (_, mut e) = header_elements.pop_back().unwrap();
                         e.properties.add(p);
                         header_elements.add(e);
-                    })
+                    }
                 }
                 Ok(Line::EndHeader) => {
                     location.next_line();
